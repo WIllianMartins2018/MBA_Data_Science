@@ -1,0 +1,165 @@
+
+
+#INTERVALO DE CONFIANÇA
+
+#INTERVALO DE CONFIANÇA PARA MÉDIA AMOSTRAL PELA DISTRIBUIÇÃO NORMAL PADRÃO
+#OBTER O INTERVALO DE CONFIANÇA DE UMA VARIÁVEL CUJA MÉDIA = 30, DESVIO = 7,31 E N = 30
+
+#TEMOS QUE DEFINIR O NÍVEL DE CONFIANÇA
+#PODEMOS OBTER O VALOR DO QUANTIL PARA O NÍVEL DE CONFIANÇA DESEJANDO USANDO A qnorm()
+
+#O quantil da Distribuição normal padrão para 95% de confiança
+
+```{r}
+  ic <- 0.95
+  alfa <- 1-ic
+  valor <- 1 - (alfa)/2
+  quantil_95 <- qnorm(valor)
+  media <- 30
+  desvio_padrao_populacional = 7.31
+  n <- 30
+```
+
+#Aplicando a formula
+
+```{r}
+  Limite_SUperior <- 30+quantil_95*(desvio_padrao_populacional/sqrt(n))
+  Limite_Inferior <- 30-quantil_95*(desvio_padrao_populacional/sqrt(n))
+  paste("Com 95% de confiança, podemos afirmar que a média varia entre", round(Limite_Inferior,2), 
+        "e", round(Limite_SUperior,2))
+```
+
+#INTERVALO DE CONFIANÇA PARA MÉDIA AMOSTRAL PELA DISTRIBUIÇÃO T Student
+
+#A TEORIA NOS DIZ, PARA UTLIZAR A DISTRIBUIÇÃO T STUDENT  QUANDO NÃO SOUBERMOS O DESVIO PADRÃO POPULACIONAL
+
+```{r}
+   n <- 30
+   desviO_padrao_amostral <- 7.31
+   quantil_95_t <- qt(0.975, df = n-1)
+```
+
+#Aplicando a formula
+
+```{r}
+   Limite_SUperior_T <- 30+quantil_95_t*(desviO_padrao_amostral/sqrt(n))
+   Limite_Inferior_T <- 30-quantil_95_t*(desviO_padrao_amostral/sqrt(n))
+   paste("Com 95% de confiança, podemos afirmar que a média varia entre", round(Limite_Inferior_T,2), 
+        "e", round(Limite_SUperior_T,2))
+```
+
+#Fornencer um intervalo de confiança bem mais fácil
+
+#VAMOS GERAR COM O COMANDO RNORM() UM VARIAVEL ALEATORIA COM MEDIA 30, DESVIO 7.31 E N = 30
+
+```{r}
+  va = rnorm(n = 30, mean = 30, sd = 7.31)
+  hist(va)
+```
+
+#CALCULANDO O INTERVALO DE 95% DE CONFIANÇA COM A DISTRIBUIÇÃO T STUDENT 
+#COM A FUNÇÃO T.TEST()
+
+```{r}
+  IC <- t.test(va, conf.level = 0.95)
+  IC$conf.int
+```
+
+#INTERVALO DE CONFIANÇA COM PARA A PROPORÇÃO
+
+```{r}
+   devolucoes <- 138
+   n <- 300
+   quantil_95 <- qnorm(0.975)
+   proporcao_devolucao = devolucoes/n
+```
+
+#Aplicando a formula
+
+```{r}
+  #Dúvida sobre a formula ou os dados esta correto
+  Limite_Superior_Prop <- proporcao_devolucao + quantil_95 * sqrt(proporcao_devolucao*(1-proporcao_devolucao)/n)
+   Limite_Inferior_Prop <- proporcao_devolucao - quantil_95 * sqrt(proporcao_devolucao*(1-proporcao_devolucao)/n)
+     paste("Com 95% de confiança, podemos afirmar que a média varia entre", Limite_Inferior_Prop, 
+        "e", Limite_Superior_Prop)
+```
+
+#Mais simples
+
+```{r}
+   IC_proporcao <- prop.test(x = 138, n = 500, conf.level = 0.95)
+   IC_proporcao$conf.int
+```
+
+#INVERVALO DE CONFIANÇA VIA MÉDIA BOOTSTAP
+
+#VAMOS GERAR UMA VA SEGUINDA UMA DISTRIBUIÇÃO QUI-QUADRADO
+
+```{r}
+   va <- rchisq(n = 60, df=3)
+   hist(va)
+```
+
+
+#Inicializa variáveis
+
+```{r}
+   medias <- c()
+   R <- 1000
+   #Bootsrap
+   for (i in 1:R) {
+       #Realiza uma subamostragem aleatória com reposição 
+       reamostra <- sample(va, size = 50, replace = T)
+       medias[i] <- mean(reamostra)
+   }
+   
+   hist(medias)
+   
+   #Mesmo a variável original não seguindo  uma distribuição normal, o Teorema do Limite Central 
+   #nos garante que a distribuição das médias sera normal se n for suficientemente grande
+```
+#Visualizando o intervalo de confiança via bootstrap
+
+```{r}
+   quantile(medias, probs = c(0.025, 0.0975))
+```
+
+#Geramentos uma va com média 30, desvio 7.31 e n = 30
+
+```{r}
+   va <- rnorm(n = 30, mean = 30, sd = 7.31)
+```
+
+#Iremos calcular o intervalo de confiança usando o Bootstrap e tambem com a distribuição
+
+
+```{r}
+   medias <- c()
+   R <- 1000
+   for (i in 1:R) {
+       #Realiza uma subamostragem aleatória com reposição 
+       reamostra <- sample(va, size = 20, replace = T)
+       medias[i] <- mean(reamostra)
+   }
+   
+   hist(medias)
+   
+```
+
+#LIMITES INFERIOR E SUPERIOR DO INTERVALO PELO BOOTSTRAP
+
+```{r}
+   quantile(medias, probs = c(0.025,0.975))
+```
+#LIMITES INFERIO E SUPERIOR DO INTERVALO VIA T DE STUDENT
+
+```{r}
+   IC <- t.test(va, conf.level= 0.95)
+   IC$conf.int
+```
+
+
+
+
+
+
